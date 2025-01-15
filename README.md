@@ -221,18 +221,45 @@ class DatabaseSeeder extends Seeder
 
         $etiquetas = Tag::all();
         Question::all()->each(function ($pregunta) use ($etiquetas){
-            $etiquetaGenerada = $etiquetas->random(
-                rand(1,6)
-            )->pluck('id')->toArray();
+            $etiquetaGenerada = $etiquetas->random(rand(1,6))->pluck('id')->toArray();
             $pregunta->tags()->attach($etiquetaGenerada);
         });
     }
 }
-
 ```
+```
+Tag::factory(6)->create();
+```
+Este código utiliza el método factory para generar 6 registros en la tabla tags usando el modelo Tag. Esto supone que has definido una fábrica de datos para el modelo Tag, que especifica cómo se deben generar los datos ficticios
+```
+Category::factory(5)->has(Question::factory(10)->hasComments(8))->create();
+```
+Category::factory(5)->create(): Genera 5 registros en la tabla categories.
+.has(Question::factory(10)): Por cada categoría generada, se crearán 10 preguntas asociadas en la tabla questions. Esto establece una relación "uno a muchos" entre categorías y preguntas.
+.hasComments(8): Por cada pregunta generada, se crearán 8 comentarios asociados en la tabla comments. Esto establece una relación "uno a muchos" entre preguntas y comentarios.
+En resumen, esta línea crea:
 
-
-
+5 categorías.
+Cada categoría tendrá 10 preguntas.
+Cada pregunta tendrá 8 comentarios.
+```
+$etiquetas = Tag::all();
+```
+Recupera todas las etiquetas generadas anteriormente (6 etiquetas).
+```
+Question::all()->each(function ($pregunta) use ($etiquetas) {
+```
+Recupera todas las preguntas generadas y para cada pregunta realiza una operación. Al hacer un question:all() generas un array con las preguntas hechas., each es un for each, en for each se le puede pasar una funcion donde function(itemActual) será una posicioion del array. En este caso pregunta puede ser ese indice.
+```
+$etiquetaGenerada = $etiquetas->random(rand(1, 6))->pluck('id')->toArray();
+```
+$etiquetas->random(rand(1,6)): Selecciona aleatoriamente entre 1 y 6 etiquetas de las disponibles.
+pluck('id'): Extrae únicamente los IDs de las etiquetas seleccionadas.
+toArray(): Convierte el conjunto de IDs en un arreglo para que pueda ser procesado fácilmente.
+```
+$pregunta->tags()->attach($etiquetaGenerada);
+```
+Asocia las etiquetas seleccionadas con la pregunta actual. Esto utiliza la relación "muchos a muchos" (tags() en el modelo Question) para insertar datos en la tabla intermedia que relaciona preguntas y etiquetas.
 
 
 MODELOS 
