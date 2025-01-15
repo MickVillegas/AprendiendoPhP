@@ -185,14 +185,110 @@ php artisan migrate:fresh --seed
 
 
 
+## DUDAS A RESPONDER, CODIGO SIGUIENTE
+
+DATABASESEEDER  
+
+```
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use App\Models\Category;
+use App\Models\Comment;
+use App\Models\Question;
+use App\Models\Tag;
+
+class DatabaseSeeder extends Seeder
+{
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        //User::factory(10)->create();
+        //Category::factory(5)->create();
+        //Question::factory(40)->create();
+        //Comment::factory(80)->create();
+        //Tag::factory(18)->create();
+        // User::factory(10)->create();
+
+        Tag::factory(6)->create();
+        Category::factory(5)->has(Question::factory(10)->hasComments(8))->create();
+
+        $etiquetas = Tag::all();
+        Question::all()->each(function ($pregunta) use ($etiquetas){
+            $etiquetaGenerada = $etiquetas->random(
+                rand(1,6)
+            )->pluck('id')->toArray();
+            $pregunta->tags()->attach($etiquetaGenerada);
+        });
+    }
+}
+
+```
 
 
 
 
 
+MODELOS 
+CATEGORY.PHP
+
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Category extends Model
+{
+    /** @use HasFactory<\Database\Factories\CategoryFactory> */
+    use HasFactory;
+    public function questions(){
+        return $this->hasMany(Question::class);
+    }
+}
+```
 
 
+QUESTION.PHP
 
+```
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Question extends Model
+{
+    /** @use HasFactory<\Database\Factories\QuestionFactory> */
+    use HasFactory;
+    public function comments(){
+        return $this->hasMany(Comment::class);
+    }
+
+    public function tags(){
+        return $this->belongsToMany(Tag::class);
+    }
+
+    public function category(){
+        return $this->belongsTo(category::class);
+    }
+
+    public function users(){
+        return $this->belongsTo(User::class);
+    }
+}
+
+```
 
 
 
